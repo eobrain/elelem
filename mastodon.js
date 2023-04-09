@@ -18,10 +18,24 @@ const notifications = async () => {
   return result
 }
 
+/** Dismiss the notification so that it will not be returned in the next call to mentions() */
 export const dismissNotification = async (notificationId) => {
   await fetch(pp(`${baseUrl}/api/v1/notifications/${notificationId}/dismiss`), {
     method: 'POST',
     headers
+  })
+}
+
+/** Post a response */
+export const toot = async (status, inReplyToId) => {
+  const body = new URLSearchParams()
+  body.append('status', status)
+  body.append('in_reply_to_id', inReplyToId)
+  pp(body)
+  await fetch(pp(`${baseUrl}/api/v1/statuses`), {
+    method: 'POST',
+    headers,
+    body
   })
 }
 
@@ -31,6 +45,7 @@ const convert = compile({
   selectors: [{ selector: 'a', options: { ignoreHref: true } }]
 })
 
+/** Return an array of all mentions, where each mention is {notificationId, acct, text} */
 export const mentions = async () =>
   (await notifications())
     .filter(
@@ -46,6 +61,7 @@ export const mentions = async () =>
     )
     .map((n) => ({
       notificationId: n.id,
+      statusId: n.status.id,
       acct: n.status.account.acct,
       text: convert(n.status.content)
     }))
