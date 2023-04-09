@@ -1,5 +1,5 @@
 import { answer } from './llm.js'
-import { mentions } from './mastodon.js'
+import { mentions, dismissNotification } from './mastodon.js'
 import { pp } from 'passprint'
 
 async function main () {
@@ -13,6 +13,7 @@ async function main () {
   const post = pp(posts[posts.length - 1])
 
   console.log(await answer(pp(post.acct), pp(post.text)))
+  await dismissNotification(pp(post.notificationId))
 }
 
 await main()

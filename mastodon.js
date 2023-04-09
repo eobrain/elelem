@@ -4,21 +4,25 @@ import { compile } from 'html-to-text'
 const accessToken = process.env.MASTODON_ACCESS_TOKEN
 const baseUrl = process.env.MASTODON_BASE_URL
 
+const headers = {
+  Authorization: `Bearer ${accessToken}`
+}
+
 const notifications = async () => {
   const result = await (
-    await fetch(
-      pp(`${baseUrl}/api/v1/notifications/`),
-      pp({
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      })
-    )
+    await fetch(pp(`${baseUrl}/api/v1/notifications/`), { headers })
   ).json()
   if (result.error) {
     throw new Error(result.error)
   }
   return result
+}
+
+export const dismissNotification = async (notificationId) => {
+  await fetch(pp(`${baseUrl}/api/v1/notifications/${notificationId}/dismiss`), {
+    method: 'POST',
+    headers
+  })
 }
 
 const INCLUDE_TYPES = ['mention']
