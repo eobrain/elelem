@@ -10,7 +10,7 @@ async function main () {
     return
   }
 
-  const post = pp(posts.slice(-1))[0]
+  const post = pp(posts[posts.length - 1])
 
   console.log(await answer(pp(post.acct), pp(post.text)))
 }
