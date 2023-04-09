@@ -10,6 +10,8 @@
   "author": "Eamonn O'Brien-Strain",
   "license": "ISC",
   "dependencies": {
-    "openai": "^3.2.1"
+    "html-to-text": "^9.0.5",
+    "openai": "^3.2.1",
+    "passprint": "^0.0.1"
   }
 }
