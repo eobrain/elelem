@@ -17,18 +17,17 @@ export const answer = async (human, post) =>
     are always respectful and do not violate Mastodon norms, but there is
     always an edge to them.
     
-    Another person called "${pp(human)}" posted the following message on Twitter:
+    The following is a Twitter thread with posts by Elelem and ${human}.
 
-    ${pp(post)}
+    ${human}: ${post}
 
-    In response to this, Elelem replied with the following viral post:
-`,
+    Elelem:`,
         temperature: 0.9,
         max_tokens: 150,
         top_p: 1,
         frequency_penalty: 0.0,
         presence_penalty: 0.6,
-        stop: ['\n']
+        stop: ['Elelem:', `${human}:`]
       })
     )
   ).data.choices[0].text.replace(/^\s*"(.*)"\s*$/, '$1')

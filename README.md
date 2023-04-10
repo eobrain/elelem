@@ -14,7 +14,7 @@ export MASTODON_ACCESS_TOKEN=...
 
 You can get the OPENAI_API_KEY from https://platform.openai.com/account/api-keys and the MASTODON_ACCESS_TOKEN from https://botsin.space/settings/applications/ 
 
-Assuming you are using `nvm` for managing your node versions, do
+Assuming you are using [nvm][1] for managing your node versions, do
 
 ```bash
 nvm use
@@ -27,3 +27,4 @@ npm install
 ./run.sh
 ```
 
+[1]:https://github.com/nvm-sh/nvm
