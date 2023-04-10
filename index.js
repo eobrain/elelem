@@ -14,6 +14,11 @@ async function main () {
 
   const response = await answer(pp(post.acct), pp(post.text))
 
+  if (response.trim() === '') {
+    console.log('LLM response is empty')
+    return
+  }
+
   await toot(pp(response), pp(post.statusId), post.acct)
 
   await dismissNotification(pp(post.notificationId))
