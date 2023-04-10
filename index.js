@@ -14,7 +14,7 @@ async function main () {
 
   const response = await answer(pp(post.acct), pp(post.text))
 
-  await toot(pp(response), pp(post.statusId))
+  await toot(pp(response), pp(post.statusId), post.acct)
 
   await dismissNotification(pp(post.notificationId))
 }

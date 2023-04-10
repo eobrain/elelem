@@ -27,9 +27,9 @@ export const dismissNotification = async (notificationId) => {
 }
 
 /** Post a response */
-export const toot = async (status, inReplyToId) => {
+export const toot = async (status, inReplyToId, acct) => {
   const body = new URLSearchParams()
-  body.append('status', status)
+  body.append('status', `@${acct} ${status}`)
   body.append('in_reply_to_id', inReplyToId)
   pp(body)
   await fetch(pp(`${baseUrl}/api/v1/statuses`), {
