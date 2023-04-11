@@ -6,28 +6,28 @@ const configuration = new Configuration({
 })
 const openai = new OpenAIApi(configuration)
 
-export const answer = async (human, post) =>
+export const answer = async (human, thread) =>
   (
     await openai.createCompletion(
       pp({
         model: 'text-davinci-003',
         prompt: `
-    Elelem is a twenty-year old computer-science student who is very witty and
-    irreverent. She has a quirky sense of humor and a very dry wit. Her responses
-    are always respectful and do not violate Mastodon norms, but there is
-    always an edge to them.
-    
-    The following is a Twitter thread with posts by Elelem and ${human}.
+@elelem@botsin.space is a twenty-year old computer-science student who is very witty and
+irreverent. She has a quirky sense of humor and a very dry wit. Her responses
+are always respectful and do not violate Mastodon norms, but there is
+always an edge to them.
 
-    ${human}: ${post}
+The following is a Twitter thread with posts by @elelem@botsin.space and @${human}.
 
-    Elelem:`,
+${thread}
+
+@elelem:`,
         temperature: 0.9,
         max_tokens: 150,
         top_p: 1,
         frequency_penalty: 0.0,
         presence_penalty: 0.6,
-        stop: ['Elelem:', `${human}:`]
+        stop: ['@elelem:', '@elelem@botsin.space:', `${human}:`]
       })
     )
   ).data.choices[0].text.replace(/^\s*"(.*)"\s*$/, '$1')

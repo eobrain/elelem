@@ -1,5 +1,5 @@
 import { answer } from './llm.js'
-import { mentions, dismissNotification, toot } from './mastodon.js'
+import { mentions, dismissNotification, getToot, toot } from './mastodon.js'
 import { pp } from 'passprint'
 
 async function main () {
@@ -10,16 +10,26 @@ async function main () {
     return
   }
 
-  const post = pp(posts[posts.length - 1])
+  let post = pp(posts[posts.length - 1])
+  const originalAcct = post.acct
+  const originalStatusId = post.statusId
 
-  const response = await answer(pp(post.acct), pp(post.text))
+  let thread = `@${post.acct}: ${post.text}`
+  while (post.inReplyToId) {
+    const parentPost = await getToot(post.inReplyToId)
+    thread = `@${parentPost.acct}: ${parentPost.text}\n\n${thread}`
+    post = parentPost
+  }
+
+  const response = await answer(post.acct, thread)
 
   if (response.trim() === '') {
     console.log('LLM response is empty')
     return
   }
 
-  await toot(pp(response), pp(post.statusId), post.acct)
+  console.log(`toot(${response}), ${originalStatusId}, ${originalAcct}`)
+  await toot(response, originalStatusId, originalAcct)
 
   await dismissNotification(pp(post.notificationId))
 }

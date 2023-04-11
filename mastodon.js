@@ -26,6 +26,21 @@ export const dismissNotification = async (notificationId) => {
   })
 }
 
+export const getToot = async (id) => {
+  const result = await (
+    await fetch(pp(`${baseUrl}/api/v1/statuses/${id}`), { headers })
+  ).json()
+  if (result.error) {
+    throw new Error(result.error)
+  }
+  return {
+    statusId: result.id,
+    acct: result.account.acct,
+    inReplyToId: result.in_reply_to_id,
+    text: convert(result.content)
+  }
+}
+
 /** Post a response */
 export const toot = async (status, inReplyToId, acct) => {
   const body = new URLSearchParams()
@@ -63,5 +78,6 @@ export const mentions = async () =>
       notificationId: n.id,
       statusId: n.status.id,
       acct: n.status.account.acct,
+      inReplyToId: n.status.in_reply_to_id,
       text: convert(n.status.content)
     }))
