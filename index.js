@@ -13,6 +13,7 @@ async function main () {
   let post = pp(posts[posts.length - 1])
   const originalAcct = post.acct
   const originalStatusId = post.statusId
+  const notificationId = post.notificationId
 
   let thread = `@${post.acct}: ${post.text}`
   while (post.inReplyToId) {
@@ -31,7 +32,7 @@ async function main () {
   console.log(`toot(${response}), ${originalStatusId}, ${originalAcct}`)
   await toot(response, originalStatusId, originalAcct)
 
-  await dismissNotification(pp(post.notificationId))
+  await dismissNotification(pp(notificationId))
 }
 
 await main()
