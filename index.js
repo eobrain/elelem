@@ -30,9 +30,9 @@ async function main () {
   }
 
   console.log(`toot(${response}), ${originalStatusId}, ${originalAcct}`)
-  await toot(response, originalStatusId, originalAcct)
+  // await toot(response, originalStatusId, originalAcct)
 
-  await dismissNotification(pp(notificationId))
+  // await dismissNotification(pp(notificationId))
 }
 
 await main()

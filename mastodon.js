@@ -74,7 +74,8 @@ export const mentions = async () =>
           !n.status.spoiler_text &&
           (!n.status.media_attachments ||
             n.status.media_attachments.length === 0) &&
-          !n.status.poll
+          !n.status.poll &&
+          !n.status.card
       )
       .map(async (n) => ({
         notificationId: n.id,
@@ -82,12 +83,6 @@ export const mentions = async () =>
         acct: n.status.account.acct,
         inReplyToId: n.status.in_reply_to_id,
         text:
-          convert(n.status.content) +
-          (n.status.card && n.status.card.type === 'link')
-            ? `
-# ${n.status.card.title}
-## ${n.status.card.description}
-${convert(await (await fetch(n.status.card.url)).text()).slice(0, 10000)}`
-            : ''
+          convert(n.status.content)
       }))
   )
