@@ -62,22 +62,32 @@ const convert = compile({
 
 /** Return an array of all mentions, where each mention is {notificationId, acct, text} */
 export const mentions = async () =>
-  (await notifications())
-    .filter(
-      (n) =>
-        INCLUDE_TYPES.includes(n.type) &&
-        !!n.status &&
-        !n.status.sensitive &&
-        !n.status.spoiler_text &&
-        (!n.status.media_attachments ||
-          n.status.media_attachments.length === 0) &&
-        !n.status.poll &&
-        !n.status.card
+  await Promise.all(
+    (
+      await notifications()
     )
-    .map((n) => ({
-      notificationId: n.id,
-      statusId: n.status.id,
-      acct: n.status.account.acct,
-      inReplyToId: n.status.in_reply_to_id,
-      text: convert(n.status.content)
-    }))
+      .filter(
+        (n) =>
+          INCLUDE_TYPES.includes(n.type) &&
+          !!n.status &&
+          !n.status.sensitive &&
+          !n.status.spoiler_text &&
+          (!n.status.media_attachments ||
+            n.status.media_attachments.length === 0) &&
+          !n.status.poll
+      )
+      .map(async (n) => ({
+        notificationId: n.id,
+        statusId: n.status.id,
+        acct: n.status.account.acct,
+        inReplyToId: n.status.in_reply_to_id,
+        text:
+          convert(n.status.content) +
+          (n.status.card && n.status.card.type === 'link')
+            ? `
+# ${n.status.card.title}
+## ${n.status.card.description}
+${convert(await (await fetch(n.status.card.url)).text()).slice(0, 10000)}`
+            : ''
+      }))
+  )
