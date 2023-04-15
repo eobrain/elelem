@@ -17,7 +17,7 @@ async function main () {
 
   const post = pp(posts[posts.length - 1])
 
-  const thread = assembleThread(post)
+  const thread = await assembleThread(post)
 
   const response = await answer(post.acct, thread)
 

@@ -30,4 +30,4 @@ ${thread}
         stop: ['@elelem:', '@elelem@botsin.space:', `${human}:`]
       })
     )
-  ).data.choices[0].text.replace(/^\s*"(.*)"\s*$/, '$1')
+  ).data.choices[0].text.replace(/^\s*"(.*)"\s*$/, '$1').trim()
