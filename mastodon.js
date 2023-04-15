@@ -2,7 +2,11 @@ import { pp } from 'passprint'
 import { compile } from 'html-to-text'
 
 const accessToken = process.env.MASTODON_ACCESS_TOKEN
-const baseUrl = process.env.MASTODON_BASE_URL
+const mastodonServer = process.env.MASTODON_SERVER
+const baseUrl = `https://${mastodonServer}`
+
+const fullAcct = (acct) =>
+  acct.match(/@/) ? acct : `${acct}@${mastodonServer}`
 
 const headers = {
   Authorization: `Bearer ${accessToken}`
@@ -66,7 +70,7 @@ export const assembleThread = async (post) => {
   return thread
 }
 
-const INCLUDE_TYPES = ['mention']
+const INCLUDE_TYPES = ['mention', 'reblog', 'favourite']
 
 const convert = compile({
   selectors: [
@@ -128,7 +132,7 @@ export const mentions = async () =>
       .map(async (n) => ({
         notificationId: n.id,
         statusId: n.status.id,
-        acct: n.status.account.acct,
+        acct: pp(fullAcct(n.status.account.acct)),
         inReplyToId: n.status.in_reply_to_id,
         text: await statusText(n.status)
       }))
