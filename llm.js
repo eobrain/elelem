@@ -47,5 +47,5 @@ ${thread}
     .replace(/^\s*"(.*)"\s*$/, '$1')
     .trim()
 
-  return text.match('@{human}\\w') ? text : `${human} ${text}`
+  return text.match('@{human}\\w') ? text : `@${human} ${text}`
 }
