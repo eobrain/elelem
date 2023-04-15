@@ -26,7 +26,7 @@ export const dismissNotification = async (notificationId) => {
   })
 }
 
-export const getToot = async (id) => {
+const getToot = async (id) => {
   const result = await (
     await fetch(pp(`${baseUrl}/api/v1/statuses/${id}`), { headers })
   ).json()
@@ -58,6 +58,16 @@ export const toot = async (status, inReplyToId, acct) => {
   })
 }
 
+export const assembleThread = async (post) => {
+  let thread = `@${post.acct}: ${post.text}`
+  while (post.inReplyToId) {
+    const parentPost = await getToot(post.inReplyToId)
+    thread = `@${parentPost.acct}: ${parentPost.text}\n\n${thread}`
+    post = parentPost
+  }
+  return thread
+}
+
 const INCLUDE_TYPES = ['mention']
 
 const convert = compile({
@@ -86,7 +96,6 @@ export const mentions = async () =>
         statusId: n.status.id,
         acct: n.status.account.acct,
         inReplyToId: n.status.in_reply_to_id,
-        text:
-          convert(n.status.content)
+        text: convert(n.status.content)
       }))
   )

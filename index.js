@@ -1,5 +1,10 @@
 import { answer } from './llm.js'
-import { mentions, dismissNotification, getToot, toot } from './mastodon.js'
+import {
+  mentions,
+  dismissNotification,
+  assembleThread,
+  toot
+} from './mastodon.js'
 import { pp } from 'passprint'
 
 async function main () {
@@ -10,17 +15,9 @@ async function main () {
     return
   }
 
-  let post = pp(posts[posts.length - 1])
-  const originalAcct = post.acct
-  const originalStatusId = post.statusId
-  const notificationId = post.notificationId
+  const post = pp(posts[posts.length - 1])
 
-  let thread = `@${post.acct}: ${post.text}`
-  while (post.inReplyToId) {
-    const parentPost = await getToot(post.inReplyToId)
-    thread = `@${parentPost.acct}: ${parentPost.text}\n\n${thread}`
-    post = parentPost
-  }
+  const thread = assembleThread(post)
 
   const response = await answer(post.acct, thread)
 
@@ -29,10 +26,10 @@ async function main () {
     return
   }
 
-  console.log(`toot(${response}), ${originalStatusId}, ${originalAcct}`)
-  await toot(response, originalStatusId, originalAcct)
+  console.log(`toot(${response}), ${post.statusId}, ${post.acct}`)
+  await toot(response, post.statusId, post.acct)
 
-  await dismissNotification(pp(notificationId))
+  await dismissNotification(pp(post.notificationId))
 }
 
 await main()
