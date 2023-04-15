@@ -67,7 +67,17 @@ export const assembleThread = async (post) => {
 const INCLUDE_TYPES = ['mention']
 
 const convert = compile({
-  selectors: [{ selector: 'a', options: { ignoreHref: true } }]
+  selectors: [
+    { selector: 'a', options: { ignoreHref: true } },
+    { selector: 'nav', format: 'skip' },
+    { selector: 'button', format: 'skip' },
+    { selector: 'form', format: 'skip' },
+    { selector: 'script', format: 'skip' },
+    { selector: 'style', format: 'skip' },
+    { selector: 'header', format: 'skip' },
+    { selector: 'footer', format: 'skip' },
+    { selector: 'template', format: 'skip' },
+  ]
 })
 
 const filteredStatus = (status) =>
@@ -75,9 +85,22 @@ const filteredStatus = (status) =>
   !status.spoiler_text &&
   (!status.media_attachments || status.media_attachments.length === 0) &&
   !status.poll &&
-  !status.card
+  (!status.card || status.card.type === 'link')
 
-const statusText = (status) => convert(status.content)
+const statusText = async (status) => {
+  let result = convert(status.content)
+  if (status.card) {
+    if (status.card.title) {
+      result += `\n${status.card.title}`
+    }
+    if (status.card.description) {
+      result += `\n${status.card.description}`
+    }
+    const linkContent = convert(await (await fetch(status.card.url)).text())
+    result += `\n${linkContent}`
+  }
+  return result
+}
 
 /** Return an array of all mentions, where each mention is {notificationId, acct, text} */
 export const mentions = async () =>
@@ -96,6 +119,6 @@ export const mentions = async () =>
         statusId: n.status.id,
         acct: n.status.account.acct,
         inReplyToId: n.status.in_reply_to_id,
-        text: statusText(n.status)
+        text: await statusText(n.status)
       }))
   )
