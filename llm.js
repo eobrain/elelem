@@ -6,8 +6,9 @@ const configuration = new Configuration({
 })
 const openai = new OpenAIApi(configuration)
 
-export const answer = async (human, thread) =>
-  (
+export const answer = async (human, thread) => {
+  const shortHuman = human.replace(/^([^@]+)@([^@]+)$/, '$1')
+  const text = (
     await openai.createCompletion(
       pp({
         model: 'text-davinci-003',
@@ -27,7 +28,17 @@ ${thread}
         top_p: 1,
         frequency_penalty: 0.0,
         presence_penalty: 0.6,
-        stop: ['@elelem:', '@elelem@botsin.space:', `${human}:`]
+        stop: [
+          '@elelem:',
+          '@elelem@botsin.space:',
+          `@${shortHuman}:`,
+          `@${human}:`
+        ]
       })
     )
-  ).data.choices[0].text.replace(/^\s*"(.*)"\s*$/, '$1').trim()
+  ).data.choices[0].text
+    .replace(/^\s*"(.*)"\s*$/, '$1')
+    .trim()
+
+  return text.match('@{human}\\w') ? text : `${human} ${text}`
+}
