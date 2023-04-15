@@ -70,6 +70,15 @@ const convert = compile({
   selectors: [{ selector: 'a', options: { ignoreHref: true } }]
 })
 
+const filteredStatus = (status) =>
+  !status.sensitive &&
+  !status.spoiler_text &&
+  (!status.media_attachments || status.media_attachments.length === 0) &&
+  !status.poll &&
+  !status.card
+
+const statusText = (status) => convert(status.content)
+
 /** Return an array of all mentions, where each mention is {notificationId, acct, text} */
 export const mentions = async () =>
   await Promise.all(
@@ -80,18 +89,13 @@ export const mentions = async () =>
         (n) =>
           INCLUDE_TYPES.includes(n.type) &&
           !!n.status &&
-          !n.status.sensitive &&
-          !n.status.spoiler_text &&
-          (!n.status.media_attachments ||
-            n.status.media_attachments.length === 0) &&
-          !n.status.poll &&
-          !n.status.card
+          filteredStatus(n.status)
       )
       .map(async (n) => ({
         notificationId: n.id,
         statusId: n.status.id,
         acct: n.status.account.acct,
         inReplyToId: n.status.in_reply_to_id,
-        text: convert(n.status.content)
+        text: statusText(n.status)
       }))
   )
