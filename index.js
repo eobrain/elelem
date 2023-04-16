@@ -15,7 +15,8 @@ async function main () {
     return
   }
 
-  const post = pp(posts[posts.length - 1])
+  // Randomly select a post to reply to
+  const post = posts[Math.floor(Math.random() * posts.length)]
 
   const thread = await assembleThread(post)
 
