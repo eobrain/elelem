@@ -25,7 +25,7 @@ The following is a Twitter thread with posts by @elelem and @${human}.
 ${thread}
 
 @elelem:`.slice(-MAX_PROMPT_CHARS)
-  const text = (
+  const data = (
     await openai.createCompletion(
       pp({
         model: 'text-davinci-003',
@@ -43,9 +43,10 @@ ${thread}
         ]
       })
     )
-  ).data.choices[0].text
-    .replace(/^\s*"(.*)"\s*$/, '$1')
-    .trim()
+  ).data
+  const usage = data.usage
+  pp({ usage })
+  const text = data.choices[0].text.replace(/^\s*"(.*)"\s*$/, '$1').trim()
 
   return text.match('@{human}\\w') ? text : `@${human} ${text}`
 }
