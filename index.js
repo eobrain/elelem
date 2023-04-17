@@ -20,7 +20,7 @@ async function main () {
   // Group posts by acct
   const postsPerAcct = {}
   for (const post of posts) {
-    if (post.acct in Object.keys(postsPerAcct)) {
+    if (Object.keys(postsPerAcct).includes(post.acct)) {
       postsPerAcct[post.acct].push(post)
     } else {
       postsPerAcct[post.acct] = [post]
@@ -29,9 +29,11 @@ async function main () {
 
   // Randomly select a user to reply to
   const acct = randomAlement(Object.keys(postsPerAcct))
+  console.log(`Chose ${acct} with ${postsPerAcct[acct].length} elements from ${Object.keys(postsPerAcct)}`)
 
   // Randomly select a post from that user
   const post = randomAlement(postsPerAcct[acct])
+  console.log(`Chose ${post.text}`)
 
   const thread = await assembleThread(post)
 
