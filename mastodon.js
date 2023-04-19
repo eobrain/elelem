@@ -17,6 +17,7 @@ const notifications = async () => {
     await fetch(pp(`${baseUrl}/api/v1/notifications/`), { headers })
   ).json()
   if (result.error) {
+    console.error({ result })
     throw new Error(result.error)
   }
   return result
@@ -58,16 +59,42 @@ export const toot = async (status, inReplyToId) => {
   })
 }
 
+const n = 3
+const ngrams = (text) => {
+  const result = []
+  for (let i = 0; i < text.length - n + 1; i++) {
+    result.push(text.slice(i, i + n))
+  }
+  return new Set(result)
+}
+
 /** Return a string that concatetes the text for all the posts
  * in the thread ending with the given post */
 export const assembleThread = async (post) => {
   let thread = `@${post.acct}: ${post.text}`
+  // let unusedNgrams = new Set(post.text.split(/\W+/))
+  const unusedNgrams = {}
+  const newPostText = post.text
+  for (const ngram of ngrams(pp(newPostText))) {
+    unusedNgrams[ngram] = true
+  }
+  const postWordCount = Object.keys(unusedNgrams).length
+  let count = 0
   while (post.inReplyToId) {
     const parentPost = await getToot(post.inReplyToId)
+    for (const ngram of ngrams(parentPost.text)) {
+      delete unusedNgrams[ngram]
+    }
     thread = `@${parentPost.acct}: ${parentPost.text}\n\n${thread}`
     post = parentPost
+    count++
   }
-  return thread
+  const fractionUnused = Object.keys(unusedNgrams).length / postWordCount
+  const terminate = count > 10 && fractionUnused < 0.15
+  if (terminate) {
+    console.log(`Terminating because at ${newPostText} repeats what's in ${thread}`)
+  }
+  return { thread, terminate }
 }
 
 const INCLUDE_TYPES = ['mention', 'reblog', 'favourite']
@@ -132,7 +159,7 @@ export const mentions = async () =>
       .map(async (n) => ({
         notificationId: n.id,
         statusId: n.status.id,
-        acct: pp(fullAcct(n.status.account.acct)),
+        acct: fullAcct(n.status.account.acct),
         inReplyToId: n.status.in_reply_to_id,
         text: await statusText(n.status)
       }))

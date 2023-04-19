@@ -10,7 +10,7 @@ import { pp } from 'passprint'
 const randomAlement = (xs) => xs[Math.floor(Math.random() * xs.length)]
 
 async function main () {
-  const posts = pp(await mentions())
+  const posts = await mentions()
 
   if (posts.length === 0) {
     console.log('No posts to reply to')
@@ -35,9 +35,14 @@ async function main () {
   const post = randomAlement(postsPerAcct[acct])
   console.log(`Chose ${post.text}`)
 
-  const thread = await assembleThread(post)
+  const { thread, terminate } = await assembleThread(post)
 
-  const response = await answer(post.acct, thread)
+  let response = await answer(post.acct, thread)
+
+  if (terminate) {
+    // Strip out the mentions from the response, to terminate the thread
+    response = response.replaceAll(`@${post.acct}`, post.acct)
+  }
 
   if (response.trim() === '') {
     console.log('LLM response is empty')
