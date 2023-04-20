@@ -46,12 +46,11 @@ ${thread}
   ).data
   const usage = data.usage
   pp({ usage })
-  const text = data.choices[0].text
+  const text = pp(data.choices[0].text)
     .replace(/^\s*"(.*)"\s*$/, '$1')
     .trim()
-    .replace(new RegExp(`(${human} )+`), `${human} `)
-    .replace(new RegExp(`(@${human} )+`), `@${human} `)
+    .replace(new RegExp(`(@${shortHuman} )+`), `@${human} `)
     .replace(new RegExp(`(@${human} )+`), `@${human} `)
 
-  return text.match('@{shortHuman}\\w') ? text : `@${shortHuman} ${text}`
+  return pp(text).match(new RegExp(`@${human}\\s`)) ? text : `@${human} ${text}`
 }
