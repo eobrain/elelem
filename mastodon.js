@@ -92,7 +92,7 @@ export const assembleThread = async (post) => {
   const fractionUnused = Object.keys(unusedNgrams).length / postWordCount
   const terminate = count > 10 && fractionUnused < 0.15
   if (terminate) {
-    console.log(`Terminating because at ${newPostText} repeats what's in ${thread}`)
+    console.log(`Terminating because at ${newPostText} repeats what's already in thread`)
   }
   return { thread, terminate }
 }
