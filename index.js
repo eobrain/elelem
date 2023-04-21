@@ -29,7 +29,11 @@ async function main () {
 
   // Randomly select a user to reply to
   const acct = randomAlement(Object.keys(postsPerAcct))
-  console.log(`Chose ${acct} with ${postsPerAcct[acct].length} elements from ${Object.keys(postsPerAcct)}`)
+  console.log(
+    `Chose ${acct} with ${
+      postsPerAcct[acct].length
+    } elements from ${Object.keys(postsPerAcct)}`
+  )
 
   // Randomly select a post from that user
   const post = randomAlement(postsPerAcct[acct])
@@ -37,20 +41,21 @@ async function main () {
 
   const { thread, terminate } = await assembleThread(post)
 
-  let response = await answer(post.acct, thread)
-
   if (terminate) {
-    // Strip out the mentions from the response, to terminate the thread
-    response = response.replaceAll(`@${post.acct}`, post.acct)
-  }
+    console.log(
+      `Not replying to ${acct} because we seem to be stuck in a conversational loop`
+    )
+  } else {
+    const response = await answer(post.acct, thread)
 
-  if (response.trim() === '') {
-    console.log('LLM response is empty')
-    return
-  }
+    if (response.trim() === '') {
+      console.log('LLM response is empty')
+      return
+    }
 
-  console.log(`toot(${response}), ${post.statusId}`)
-  await toot(response, post.statusId)
+    console.log(`toot(${response}), ${post.statusId}`)
+    await toot(response, post.statusId)
+  }
 
   await dismissNotification(pp(post.notificationId))
 }
