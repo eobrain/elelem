@@ -5,6 +5,10 @@ const accessToken = process.env.MASTODON_ACCESS_TOKEN
 const mastodonServer = process.env.MASTODON_SERVER
 const baseUrl = `https://${mastodonServer}`
 
+// Conditions for terminating a thread of conversations
+const TERMINATE_MIN_COUNT = 20
+const TERMINATE_MIN_FRACTION_REPEATED = 0.8
+
 const fullAcct = (acct) =>
   acct.match(/@/) ? acct : `${acct}@${mastodonServer}`
 
@@ -89,10 +93,16 @@ export const assembleThread = async (post) => {
     post = parentPost
     count++
   }
-  const fractionUnused = Object.keys(unusedNgrams).length / postWordCount
-  const terminate = count > 10 && fractionUnused < 0.15
+  const fractionRepeated = 1 - Object.keys(unusedNgrams).length / postWordCount
+  const terminate =
+    count > TERMINATE_MIN_COUNT &&
+    fractionRepeated > TERMINATE_MIN_FRACTION_REPEATED
   if (terminate) {
-    console.log(`Terminating because at ${newPostText} repeats what's already in thread`)
+    console.log(
+      `Terminating because "
+${newPostText}
+" is in ${count}-long thread and repeats ${fractionRepeated} what's already in thread`
+    )
   }
   return { thread, terminate }
 }
