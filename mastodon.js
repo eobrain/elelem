@@ -1,6 +1,7 @@
 import { pp } from 'passprint'
 import { compile } from 'html-to-text'
 
+const BOT_ACCOUNT = 'elelem'
 const accessToken = process.env.MASTODON_ACCESS_TOKEN
 const mastodonServer = process.env.MASTODON_SERVER
 const baseUrl = `https://${mastodonServer}`
@@ -171,6 +172,11 @@ export const mentions = async () =>
         statusId: n.status.id,
         acct: fullAcct(n.status.account.acct),
         inReplyToId: n.status.in_reply_to_id,
+        mentions: pp(
+          n.status.mentions
+            .filter((m) => m.acct !== BOT_ACCOUNT)
+            .map((m) => '@' + fullAcct(m.acct))
+        ),
         text: await statusText(n.status)
       }))
   )

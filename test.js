@@ -1,5 +1,10 @@
 import { answer } from './llm.js'
 import { mentions, assembleThread } from './mastodon.js'
+import { pp } from 'passprint'
+
+const fakeAnswer = async (acct, thread) => {
+  return '@foo@bar.com @elelem@botsin.space Hello'
+}
 
 async function main () {
   const posts = await mentions()
@@ -10,16 +15,22 @@ async function main () {
 
     const { thread, terminate } = await assembleThread(post)
 
-    let response = await answer(post.acct, thread)
-
     if (terminate) {
-      // Strip out the mentions from the response, to terminate the thread
-      response = response.replaceAll(`@${post.acct}`, post.acct)
+      console.log('Terminate')
+      continue
     }
+    // let response = await answer(post.acct, thread)
+    let response = await fakeAnswer(post.acct, thread)
 
     if (response.trim() === '') {
       console.log('LLM response is empty')
       continue
+    }
+
+    for (const mention of post.mentions) {
+      if (!response.includes(mention)) {
+        response = mention + ' ' + response
+      }
     }
 
     const statusId = post.statusId

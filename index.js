@@ -46,11 +46,17 @@ async function main () {
       `Not replying to ${acct} because we seem to be stuck in a conversational loop`
     )
   } else {
-    const response = await answer(post.acct, thread)
+    let response = await answer(post.acct, thread)
 
     if (response.trim() === '') {
       console.log('LLM response is empty')
       return
+    }
+
+    for (const mention of post.mentions) {
+      if (!response.includes(mention)) {
+        response = mention + ' ' + response
+      }
     }
 
     console.log(`toot(${response}), ${post.statusId}`)
