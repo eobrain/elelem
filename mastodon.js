@@ -51,17 +51,24 @@ const getToot = async (id) => {
   }
 }
 
-/** Post a response */
+/** Post a response.  Returns true if successful */
 export const toot = async (status, inReplyToId) => {
   const body = new URLSearchParams()
   body.append('status', status)
   body.append('in_reply_to_id', inReplyToId)
   pp(body)
-  pp(await fetch(pp(`${baseUrl}/api/v1/statuses`), {
+  const response = await fetch(pp(`${baseUrl}/api/v1/statuses`), {
     method: 'POST',
     headers,
     body
-  }))
+  })
+  if (response.status !== 200) {
+    pp(response)
+  }
+  return {
+    status: response.status,
+    statusText: response.statusText
+  }
 }
 
 const n = 3

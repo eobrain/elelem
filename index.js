@@ -30,8 +30,7 @@ async function main () {
   // Randomly select a user to reply to
   const acct = randomAlement(Object.keys(postsPerAcct))
   console.log(
-    `Chose ${acct} with ${
-      postsPerAcct[acct].length
+    `Chose ${acct} with ${postsPerAcct[acct].length
     } elements from ${Object.keys(postsPerAcct)}`
   )
 
@@ -60,7 +59,11 @@ async function main () {
     }
 
     console.log(`toot(${response}), ${post.statusId}`)
-    await toot(response, post.statusId)
+    const { status, statusText } = pp(await toot(response, post.statusId))
+    if (status !== 200) {
+      console.loog(`Failed to toot with status=#{status} (${statusText})`)
+      return
+    }
   }
 
   await dismissNotification(pp(post.notificationId))
