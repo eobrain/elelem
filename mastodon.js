@@ -57,11 +57,11 @@ export const toot = async (status, inReplyToId) => {
   body.append('status', status)
   body.append('in_reply_to_id', inReplyToId)
   pp(body)
-  await fetch(pp(`${baseUrl}/api/v1/statuses`), {
+  pp(await fetch(pp(`${baseUrl}/api/v1/statuses`), {
     method: 'POST',
     headers,
     body
-  })
+  }))
 }
 
 const n = 3
