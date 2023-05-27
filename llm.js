@@ -26,27 +26,17 @@ ${thread}
 
 @elelem:`.slice(-MAX_PROMPT_CHARS)
   const data = (
-    await openai.createCompletion(
-      pp({
-        model: 'text-davinci-003',
-        prompt,
-        temperature: 0.9,
-        max_tokens: MAX_POST_TOKENS,
-        top_p: 1,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.6,
-        stop: [
-          '@elelem:',
-          '@elelem@botsin.space:',
-          `@${shortHuman}:`,
-          `@${human}:`
-        ]
-      })
-    )
+    await openai.createChatCompletion(pp({
+      model: 'gpt-3.5-turbo',
+      messages: [{
+        role: 'user',
+        content: prompt
+      }]
+    }))
   ).data
   const usage = data.usage
   pp({ usage })
-  const text = pp(data.choices[0].text)
+  const text = pp(data.choices[0].message.content)
     .replace(/^\s*"(.*)"\s*$/, '$1')
     .trim()
     .replace(new RegExp(`(@${shortHuman} )+`), `@${human} `)

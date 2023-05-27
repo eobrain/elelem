@@ -19,8 +19,8 @@ async function main () {
       console.log('Terminate')
       continue
     }
-    // let response = await answer(post.acct, thread)
-    let response = await fakeAnswer(post.acct, thread)
+    let response = await answer(post.acct, thread)
+    // let response = await fakeAnswer(post.acct, thread)
 
     if (response.trim() === '') {
       console.log('LLM response is empty')
