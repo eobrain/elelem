@@ -7,6 +7,13 @@ import {
 } from './mastodon.js'
 import { pp } from 'passprint'
 
+// Prevent
+const MAX_EXECUTION_TIME_MS = 5 * 60 * 1000
+setTimeout(() => {
+  pp(`Elelem has been running for ${MAX_EXECUTION_TIME_MS / 1000} seconds. Exiting.`)
+  process.exit(1)
+}, MAX_EXECUTION_TIME_MS)
+
 const randomAlement = (xs) => xs[Math.floor(Math.random() * xs.length)]
 
 async function main () {
@@ -61,7 +68,7 @@ async function main () {
     console.log(`toot(${response}), ${post.statusId}`)
     const { status, statusText } = pp(await toot(response, post.statusId))
     if (status !== 200) {
-      console.loog(`Failed to toot with status=#{status} (${statusText})`)
+      console.log(`Failed to toot with status=#{status} (${statusText})`)
       return
     }
   }
@@ -70,3 +77,5 @@ async function main () {
 }
 
 await main()
+pp('Finished successfully')
+process.exit(0)
