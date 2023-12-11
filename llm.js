@@ -27,7 +27,7 @@ ${thread}
 @elelem:`.slice(-MAX_PROMPT_CHARS)
   const data = (
     await openai.createChatCompletion(pp({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4',
       messages: [{
         role: 'user',
         content: prompt
